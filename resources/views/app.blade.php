@@ -11,7 +11,7 @@
 	<link href='//fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
 
 </head>
-<body>
+<body style="background-color:grey">
 	@include('partials.nav')
 
     <div class="container">
