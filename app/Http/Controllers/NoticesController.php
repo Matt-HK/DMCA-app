@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PrepareNoticeRequest;
+use App\Provider;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+
 class NoticesController extends Controller
 {
 
-    /*
+    /**
      * Create new notices controller instance.
      */
     public function __construct()
@@ -17,7 +20,7 @@ class NoticesController extends Controller
         $this->middleware('auth');
     }
 
-    /*
+    /**
      * Show all notices.
      * @return string
      */
@@ -26,15 +29,21 @@ class NoticesController extends Controller
         return 'all notices';
     }
 
-    /*
-    * Show page for creating a notice.
-     * @return \Response
-    */
+    /**
+     * Show page for creating a notice.
+     * @return \Illuminate\View\View
+     */
+
     public function create()
     {
-        //get list of providers
+        $providers = Provider::lists('name', 'id');
 
-        //load a view to create a new notice
-        return view('notices.create');
+        return view('notices.create', compact('providers'));
+    }
+
+
+    public function confirm(PrepareNoticeRequest $request)
+    {
+        return $request->all();
     }
 }

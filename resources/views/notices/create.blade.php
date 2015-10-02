@@ -4,11 +4,11 @@
 
     <h1 class="page-heading">Prepare a DMCA Notice</h1>
 
-    {!! Form::open() !!}
+    {!! Form::open(['method' => 'GET', 'action' => 'NoticesController@confirm']) !!}
 
     <div class="form-group">
         {!! Form::label('provider_id', 'Send to:') !!}
-        {!! Form::select('provider_id', [], null, ['class' => 'form-control']) !!}
+        {!! Form::select('provider_id', $providers, null, ['class' => 'form-control']) !!}
     </div>
     <div class="form-group">
         {!! Form::label('infringing_title', 'Infringing title:') !!}
@@ -24,12 +24,14 @@
     </div>
     <div class="form-group">
         {!! Form::label('original_description', 'Original description:') !!}
-        {!! Form::text('original_description', null, ['class' => 'form-control']) !!}
+        {!! Form::textarea('original_description', null, ['class' => 'form-control']) !!}
     </div>
     <div class="form-group">
         {!! Form::submit('Preview Notice', ['class' => 'btn btn-primary form-control']) !!}
     </div>
 
     {!! Form::close() !!}
+
+    @include('errors.list')
 
 @stop
