@@ -9,6 +9,7 @@ use App\Provider;
 use Auth;
 use Illuminate\Auth\Guard;
 use Illuminate\Http\Request;
+use Mail;
 
 
 class NoticesController extends Controller
@@ -60,12 +61,16 @@ class NoticesController extends Controller
 
     public function store(Request $request)
     {
-        $this->createNotice($request);
+        $notice = $this->createNotice($request);
+
+        Mail::queue('emails.dmca', compact('notice'), function($message) use ($notice) {
+            $message
+                ->from($notice->getOwnerEmail())
+                ->to($notice->getRecipientEmail())
+                ->subject('DMCA Notice');
+        });
 
         return redirect('notices');
-
-        // persist it with this data
-        // fire off the email
     }
 
     /**
@@ -89,10 +94,10 @@ class NoticesController extends Controller
      */
     public function createNotice(Request $request)
     {
-        $data = session()->get('dmca');
+        $notice = session()->get('dmca') + ['template' => $request->input('template')];
 
-        $notice = Notice::open($data)->useTemplate($request->input('template'));
+        $notice = Auth::user()->notices()->create($notice);
 
-        Auth::user()->notices()->save($notice);
+        return $notice;
     }
 }
