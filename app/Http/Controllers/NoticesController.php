@@ -21,6 +21,8 @@ class NoticesController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+
+        parent::__construct();
     }
 
     /**
@@ -29,7 +31,7 @@ class NoticesController extends Controller
      */
     public function index()
     {
-        return Auth::user()->notices;
+        return $this->user->notices;
     }
 
     /**
@@ -47,12 +49,11 @@ class NoticesController extends Controller
     /**
      * Receives/compiles user data, sends user to confirmation page.
      * @param PrepareNoticeRequest $request
-     * @param Guard $auth
      * @return \Response
      */
-    public function confirm(PrepareNoticeRequest $request, Guard $auth)
+    public function confirm(PrepareNoticeRequest $request)
     {
-        $template = $this->compileDmcaTemplate($data = $request->all(), $auth);
+        $template = $this->compileDmcaTemplate($data = $request->all());
 
         session()->flash('dmca', $data);
 
@@ -76,14 +77,13 @@ class NoticesController extends Controller
     /**
      * Compile the DMCA template from form data.
      * @param $data
-     * @param Guard $auth
      * @return mixed
      */
-    public function compileDmcaTemplate($data, Guard $auth)
+    public function compileDmcaTemplate($data)
     {
         $data = $data + [
-                'name' => $auth->user()->name,
-                'email' => $auth->user()->email,
+                'name' => $this->user->name,
+                'email' => $this->user->email,
             ];
 
         return view()->file(app_path('Http/Templates/dmca.blade.php'), $data);
@@ -91,12 +91,13 @@ class NoticesController extends Controller
 
     /** Create and persist a new notice.
      * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function createNotice(Request $request)
     {
         $notice = session()->get('dmca') + ['template' => $request->input('template')];
 
-        $notice = Auth::user()->notices()->create($notice);
+        $notice = $this->user->notices()->create($notice);
 
         return $notice;
     }
